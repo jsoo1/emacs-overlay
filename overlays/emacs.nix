@@ -183,6 +183,8 @@ in
 
   inherit commercial-emacs;
 
+  inherit mkGitEmacs;
+
   emacsWithPackagesFromUsePackage = import ../elisp.nix { pkgs = self; };
 
   emacsWithPackagesFromPackageRequires = import ../packreq.nix { pkgs = self; };
