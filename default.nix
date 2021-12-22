@@ -98,6 +98,8 @@ let
 
 in
 {
+  inherit mkGitEmacs;
+
   inherit emacsGit emacsUnstable;
 
   inherit emacsGcc;
