@@ -172,7 +172,7 @@ in
     )
   );
 
-  inherit emacsLsp;
+  inherit emacsLsp mkGitEmacs;
 
   emacsWithPackagesFromUsePackage = import ../elisp.nix { pkgs = self; };
 
