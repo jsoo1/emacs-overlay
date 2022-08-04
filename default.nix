@@ -61,21 +61,17 @@ let
           )
         )
 
-        # --with-nativecomp was changed to --with-native-compilation
-        # Remove this once 21.05 is released
-        (drv: if drv.passthru.nativeComp && self.lib.elem "--with-nativecomp" drv.configureFlags then drv.overrideAttrs(old: {
-          configureFlags = builtins.map (flag: if flag == "--with-nativecomp" then "--with-native-compilation" else flag) old.configureFlags;
-        }) else drv)
-
         # reconnect pkgs to the built emacs
         (
-          drv: let
+          drv:
+          let
             result = drv.overrideAttrs (old: {
               passthru = old.passthru // {
                 pkgs = self.emacsPackagesFor result;
               };
             });
-          in result
+          in
+          result
         )
       ];
 
@@ -88,11 +84,16 @@ let
 
   emacsGit = mkGitEmacs "emacs-git" ./repos/emacs/emacs-master.json { withSQLite3 = true; };
 
-  emacsGcc = (mkGitEmacs "emacs-gcc" ./repos/emacs/emacs-unstable.json { nativeComp = true; });
+  emacsNativeComp = super.emacsNativeComp or (mkGitEmacs "emacs-native-comp" ./repos/emacs/emacs-unstable.json { nativeComp = true; });
+
+  emacsGitNativeComp = mkGitEmacs "emacs-git-native-comp" ./repos/emacs/emacs-master.json {
+    withSQLite3 = true;
+    nativeComp = true;
+  };
 
   emacsPgtk = mkPgtkEmacs "emacs-pgtk" ./repos/emacs/emacs-master.json { withSQLite3 = true; };
 
-  emacsPgtkGcc = mkPgtkEmacs "emacs-pgtkgcc" ./repos/emacs/emacs-master.json { nativeComp = true; withSQLite3 = true; };
+  emacsPgtkNativeComp = mkPgtkEmacs "emacs-pgtk-native-comp" ./repos/emacs/emacs-master.json { nativeComp = true; withSQLite3 = true; };
 
   emacsUnstable = (mkGitEmacs "emacs-unstable" ./repos/emacs/emacs-unstable.json { });
 
@@ -102,9 +103,9 @@ in
 
   inherit emacsGit emacsUnstable;
 
-  inherit emacsGcc;
+  inherit emacsNativeComp emacsGitNativeComp;
 
-  inherit emacsPgtk emacsPgtkGcc;
+  inherit emacsPgtk emacsPgtkNativeComp;
 
   emacsGit-nox = (
     (
@@ -178,4 +179,7 @@ in
     )
   );
 
+} // super.lib.optionalAttrs (super.config.allowAliases or true) {
+  emacsGcc = builtins.trace "emacsGcc has been renamed to emacsNativeComp, please update your expression." emacsNativeComp;
+  emacsPgtkGcc = builtins.trace "emacsPgtkGcc has been renamed to emacsPgtkNativeComp, please update your expression." emacsPgtkNativeComp;
 }

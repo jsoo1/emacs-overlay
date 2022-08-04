@@ -21,12 +21,12 @@ let
     inputs = {
       src = {
         type = "git";
-        value = "git://github.com/nix-community/emacs-overlay.git";
+        value = "https://github.com/nix-community/emacs-overlay.git";
         emailresponsible = false;
       };
       nixpkgs = {
         type = "git";
-        value = "git://github.com/NixOS/nixpkgs.git ${nixpkgsRelease}";
+        value = "https://github.com/NixOS/nixpkgs.git ${nixpkgsRelease}";
         emailresponsible = false;
       };
     };
@@ -41,9 +41,21 @@ let
     };
 
     stable = mkJobset {
-      nixpkgsRelease = "nixos-21.11";
+      nixpkgsRelease = "nixos-22.05";
       nixFile = "emacsen.nix";
       descriptionNote = "emacs";
+    };
+
+    unstable-cross = mkJobset {
+      nixpkgsRelease = "nixos-unstable";
+      nixFile = "emacsen-cross.nix";
+      descriptionNote = "emacs cross builds";
+    };
+
+    stable-cross = mkJobset {
+      nixpkgsRelease = "nixos-22.05";
+      nixFile = "emacsen-cross.nix";
+      descriptionNote = "emacs cross builds";
     };
 
     unstable-pkgs = mkJobset {
